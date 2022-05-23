@@ -1,0 +1,49 @@
+.todoapp {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 40px 80px;
+  }
+  
+  .todo-list {
+    display: flex;
+    flex-flow: column;
+    gap: 20px;
+  }
+  
+  footer.info {
+    background: black;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 20px 40px;
+  }
+  
+  .view {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .destroy {
+    height: 24px;
+    width: 24px;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 12px;
+    font-family: monospace;
+    padding: 4px;
+  }
+  
+  :not(.editing) .edit {
+    display: none;
+  }
+  
+  .filters {
+    margin: 40px 0 20px;
+  }
+
+.day-of-week {
+  font-family: monospace;
+}
+  
