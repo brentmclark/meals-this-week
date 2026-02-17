@@ -1,0 +1,78 @@
+You are Codex working in my codebase (weekly meal planner app). Your job is to implement the UX and behavior fixes described below. Keep changes minimal, follow existing patterns in the repo, and don’t introduce new libraries unless absolutely necessary. If anything is ambiguous, make the most reasonable choice consistent with the app’s current design.
+
+## Goals / Issues to Fix
+
+### 1) “Edit Day” affordance
+- The “Edit Day” control doesn’t look like a button.
+- Update styling so it is clearly an interactive button/link-button (consistent with existing UI components).
+- Ensure hover/focus/active states are visible and accessible.
+
+### 2) Thaw reminder save bug (reverts to “No thaw reminder”)
+- Repro: Edit a day → change thaw reminder → Save → the value reverts to “No thaw reminder” in the edit UI.
+- However, the week view may show it correctly after navigating back, which suggests a state/controlled-input mismatch or stale form state.
+- Fix so the saved thaw reminder persists immediately and correctly:
+  - After Save, the edit view should reflect the saved value.
+  - Reloading the week should not change it.
+  - No silent fallback to “No thaw reminder” unless the user explicitly selects it.
+
+### 3) Post-save navigation
+- After editing a day and hitting Save, the UI should return to the weekly listing view (week overview), not remain in the edit screen.
+
+### 4) Thaw reminder model (stop using meat list as the reminder itself)
+Current behavior looks like a fixed set: “chicken, chuck roast, turkey, ham” etc. That’s not workable.
+- Change the thaw reminder concept so it’s tied to the meal (or staged meal) and not limited to a meat list.
+- Desired behavior:
+  - A user can enter a custom thaw reminder label (e.g., “Potato & ham soup”) OR optionally derive it from the meal name.
+  - A user can set a lead time (days before) for the reminder (e.g., 2 days).
+  - The UI should not force selecting “chuck roast” to mean “thaw soup”.
+- Implement in a way that fits the existing data model:
+  - If there is already a thawReminder field, convert it to a free-text string (or add a separate thawReminderLabel).
+  - Add thawLeadDays (integer) if it doesn’t exist.
+  - Update any validation, defaults, and display formatting.
+- Update any places that display thaw reminders so they show the label + lead time clearly.
+
+### 5) Search UX improvements
+- Pressing Enter in the search input should trigger search (native expected behavior).
+- Add an explicit Clear button/icon that:
+  - Clears the search term
+  - Resets the results/list to the unfiltered state
+- Current workaround (delete term then search again) should no longer be required.
+
+### 6) Menu item selection styling
+- Selected menu items currently look like “full-blown buttons” and it looks weird.
+- Adjust selected-state styling to be more subtle (e.g., highlight/outline/background) without making the whole row look like a big button.
+- Keep accessibility (selected state must still be obvious).
+
+### 7) Staged meals: remove unnecessary date fields
+In the “staged meals” add UI:
+- There are date fields that:
+  - don’t appear required
+  - are unclear what they do
+  - likely aren’t needed at all
+- Remove these date fields from the staged meal add interface.
+- Ensure staging a meal only requires what’s truly needed to put it into the “staged meals” list for future use.
+- Update the underlying model/API only if those fields are actually used; otherwise remove dead fields/UI wiring safely.
+
+## Deliverables
+1) Make the code changes.
+2) Provide a brief summary of what you changed and where.
+3) Include any migrations or data-shape adjustments if you changed persisted fields.
+4) Add/update tests if the repo has testing patterns for these components (especially for the thaw reminder save bug and Enter-to-search behavior).
+
+## Acceptance Criteria (Quick Checklist)
+- [ ] “Edit Day” looks clickable like a button and has focus styles
+- [ ] Changing thaw reminder + saving does NOT revert to “No thaw reminder”
+- [ ] Save returns user to weekly list view
+- [ ] Thaw reminder supports custom label + lead-time days (not meat list)
+- [ ] Enter triggers search; Clear resets list
+- [ ] Selected menu items look clean/subtle, not giant buttons
+- [ ] Staged meal add UI has no date fields; staging still works end-to-end
+
+Start by locating the components/routes for:
+- week view
+- day edit view
+- thaw reminder UI + persistence
+- search input/list filtering
+- staged meals add form
+
+Then implement the fixes above.

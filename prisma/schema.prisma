@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Household {
+  id           BigInt      @id @default(autoincrement()) @db.BigInt
+  name         String      @unique
+  weekStartsOn Int         @default(0) @map("week_starts_on") @db.SmallInt
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  users        User[]
+  weekDays     WeekDay[]
+  meals        Meal[]
+  thawRules    ThawRule[]
+  mealEntries  MealEntry[]
+  stagedMeals  StagedMeal[]
+  mealHistory  MealHistory[]
+  reminders    Reminder[]
+
+  @@map("households")
+}
+
+model User {
+  id          BigInt    @id @default(autoincrement()) @db.BigInt
+  householdId BigInt    @map("household_id") @db.BigInt
+  email       String    @unique
+  displayName String    @map("display_name")
+  role        String    @default("member")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntries MealEntry[] @relation("MealEntryCreatedBy")
+  stagedMeals StagedMeal[] @relation("StagedMealCreatedBy")
+
+  @@map("users")
+}
+
+model WeekDay {
+  id          BigInt     @id @default(autoincrement()) @db.BigInt
+  householdId BigInt     @map("household_id") @db.BigInt
+  dayDate     DateTime   @map("day_date") @db.Date
+  nightType   String     @default("normal") @map("night_type")
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntry   MealEntry?
+
+  @@unique([householdId, dayDate])
+  @@index([householdId, dayDate], map: "idx_week_days_household_date")
+  @@map("week_days")
+}
+
+model Meal {
+  id          BigInt     @id @default(autoincrement()) @db.BigInt
+  householdId BigInt     @map("household_id") @db.BigInt
+  name        String
+  defaultNote String?    @map("default_note")
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntries MealEntry[]
+  stagedMeals StagedMeal[]
+
+  @@unique([householdId, name])
+  @@map("meals")
+}
+
+model ThawRule {
+  id          BigInt     @id @default(autoincrement()) @db.BigInt
+  householdId BigInt     @map("household_id") @db.BigInt
+  name        String
+  leadDays    Int        @map("lead_days")
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntries MealEntry[]
+
+  @@unique([householdId, name])
+  @@map("thaw_rules")
+}
+
+model MealEntry {
+  id          BigInt      @id @default(autoincrement()) @db.BigInt
+  householdId BigInt      @map("household_id") @db.BigInt
+  weekDayId   BigInt      @unique @map("week_day_id") @db.BigInt
+  dayDate     DateTime    @map("day_date") @db.Date
+  mealId      BigInt?     @map("meal_id") @db.BigInt
+  mealName    String      @map("meal_name")
+  notes       String?
+  thawReminderLabel String? @map("thaw_reminder_label")
+  thawLeadDays Int? @map("thaw_lead_days") @db.SmallInt
+  thawRuleId  BigInt?     @map("thaw_rule_id") @db.BigInt
+  createdBy   BigInt?     @map("created_by") @db.BigInt
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  household   Household   @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  weekDay     WeekDay     @relation(fields: [weekDayId], references: [id], onDelete: Cascade)
+  meal        Meal?       @relation(fields: [mealId], references: [id], onDelete: SetNull)
+  thawRule    ThawRule?   @relation(fields: [thawRuleId], references: [id], onDelete: SetNull)
+  creator     User?       @relation("MealEntryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  history     MealHistory[]
+  reminders   Reminder[]
+
+  @@map("meal_entries")
+}
+
+model StagedMeal {
+  id            BigInt    @id @default(autoincrement()) @db.BigInt
+  householdId   BigInt    @map("household_id") @db.BigInt
+  mealId        BigInt?   @map("meal_id") @db.BigInt
+  mealName      String    @map("meal_name")
+  preferredDate DateTime? @map("preferred_date") @db.Date
+  notBeforeDate DateTime? @map("not_before_date") @db.Date
+  note          String?
+  status        String    @default("staged")
+  createdBy     BigInt?   @map("created_by") @db.BigInt
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  household     Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  meal          Meal?     @relation(fields: [mealId], references: [id], onDelete: SetNull)
+  creator       User?     @relation("StagedMealCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([householdId, status], map: "idx_staged_household_status")
+  @@map("staged_meals")
+}
+
+model MealHistory {
+  id          BigInt    @id @default(autoincrement()) @db.BigInt
+  householdId BigInt    @map("household_id") @db.BigInt
+  mealEntryId BigInt    @map("meal_entry_id") @db.BigInt
+  mealName    String    @map("meal_name")
+  occurredOn  DateTime  @map("occurred_on") @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntry   MealEntry @relation(fields: [mealEntryId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, mealEntryId])
+  @@index([householdId, occurredOn], map: "idx_history_household_date")
+  @@map("meal_history")
+}
+
+model Reminder {
+  id              BigInt     @id @default(autoincrement()) @db.BigInt
+  householdId     BigInt     @map("household_id") @db.BigInt
+  mealEntryId     BigInt?    @map("meal_entry_id") @db.BigInt
+  reminderType    String     @default("thaw") @map("reminder_type")
+  dueAt           DateTime   @map("due_at") @db.Timestamptz(6)
+  message         String
+  status          String     @default("pending")
+  sentAt          DateTime?  @map("sent_at") @db.Timestamptz(6)
+  deliveryChannel String     @default("in_app") @map("delivery_channel")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  household       Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  mealEntry       MealEntry? @relation(fields: [mealEntryId], references: [id], onDelete: Cascade)
+
+  @@index([householdId, dueAt], map: "idx_reminders_household_due")
+  @@map("reminders")
+}

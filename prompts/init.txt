@@ -1,0 +1,117 @@
+You are Codex. Help me plan and start implementing a small, private, family-only meal planning web app.
+
+Context / Goal
+- This is NOT a product to sell right now. It’s for my household (a handful of users).
+- We currently use a physical dry-erase/chalkboard on the fridge that shows “what’s for dinner” for the week.
+- The core value: a centralized weekly dinner list everyone can see + lightweight planning that accounts for how busy each night is.
+- We do weekly planning once per week (typically Sundays), but the specific day isn’t critical.
+
+Core User Experience (Phase 1 MVP)
+1) Weekly Dinner Plan (centralized)
+   - A single view that shows the dinners for the current week (Sun–Sat is fine, but configurable week start is optional).
+   - Everyone in the family can view it easily on their phone.
+   - It should also work well on a wall-mounted touchscreen in the house (i.e., a large “kitchen display” mode / full-screen view).
+
+2) “Quick Night” vs “Normal Night”
+   - For each day, allow setting a simple flag like:
+     - Quick night (busy activity night)
+     - Normal night (we have time)
+   - This flag is intentionally NOT granular (no 42 vs 90 minutes). It’s just busy vs not-busy.
+   - Phase 1 does NOT require calendar-driven behavior. (Calendar integration may come later only for visibility.)
+
+3) Meal History
+   - Automatically track/log past meals in a centralized history.
+   - We use history to spark ideas (“what did we eat before?”).
+   - Provide a simple way to browse/search/filter past meals (at least by text, later by tags).
+
+4) “Staging” Meals for Future Weeks
+   - Ability to stage/suggest a meal for some future date/week.
+   - Example: kid requests spaghetti right after we ate it; we stage it for next week or a future Thursday.
+   - Staged meals should be easy to slot into the weekly plan when doing Sunday planning.
+   - Staged items can have an optional “not before” date or preferred date.
+
+5) Thaw / Prep Notifications (lightweight “recipe” concept without full recipes)
+   - When adding a meal to a day, optionally capture whether it uses meat that requires thawing/prep.
+   - If meat is selected, schedule a reminder ahead of time, based on configurable rules:
+     - Chicken: remind 24 hours before (1 day)
+     - Chuck roast: remind 2 days before
+     - Turkey or ham: remind ~5 days before
+   - The reminder content should say something like: “Take chicken out of freezer to thaw for tomorrow’s dinner.”
+   - This is NOT full grocery automation. No auto grocery list in Phase 1.
+   - UX can be a simple prompt during meal creation: “Any meat to thaw?” -> select from a small list (configurable).
+
+Non-Goals (explicitly out of scope for Phase 1)
+- No “full recipe integration” required initially.
+  - I keep recipes on GitHub, but I don’t want to integrate with GitHub yet.
+  - Meals can be “clever names” without a structured recipe.
+- No automated grocery list generation in Phase 1 (too complex).
+- No requirement that my wife/kids manage external calendars.
+- No requirement to create or manage a separate “family calendar” inside this app.
+
+Tech / Stack Preferences
+- Use Next.js (plain JavaScript, not TypeScript).
+- Authentication: keep it simple for a family-only app.
+  - Suggest a minimal auth approach (e.g., email magic link, simple credentials, or a shared household login) with reasonable security.
+- Hosting: avoid Vercel. I already have a project there and want to move off it.
+  - I want inexpensive hosting for ~4-ish users (I do NOT want to pay ~$20+/mo just for hosting).
+  - I’m willing to be “closer to the metal.”
+  - Candidates: Fly.io, DigitalOcean (App Platform or Droplet), maybe similar.
+- Database:
+  - If hosting on Fly.io, consider using Fly Postgres so app + DB are together and costs stay low.
+  - Alternatively, a managed Postgres like Supabase is acceptable only if cost stays low and ops burden is lower.
+- Notifications:
+  - Phase 1 can start with email reminders or simple push-notification-like behavior.
+  - If push is too much for MVP, implement reminders as:
+    - scheduled jobs that send email, OR
+    - in-app “Upcoming Prep” list and optional email.
+  - But the system should be designed so real push notifications could be added later.
+
+What I want from you (Codex)
+A) Produce a concise product/engineering plan:
+   - Data model (tables/collections) for: users, family/household, days, meals, meal entries, staged meals, history, thaw rules, reminders.
+   - Core screens/routes and interactions.
+   - How reminders are scheduled and delivered.
+   - Minimal auth approach suitable for family.
+
+B) Provide an initial implementation skeleton in Next.js (JavaScript):
+   - App structure and key pages/components:
+     - Weekly view (with Quick/Normal toggle per day)
+     - Add/edit meal on a day
+     - History page
+     - Staged meals page (backlog + scheduling)
+     - Kitchen display mode (full-screen readable weekly view)
+   - API routes for CRUD
+   - DB integration (Postgres recommended)
+
+C) Provide a recommended deployment path:
+   - Option 1: Fly.io app + Fly Postgres (preferred if cost-effective)
+   - Option 2: DigitalOcean (Droplet or App Platform) + managed Postgres
+   - Give rough monthly cost expectations and what to watch (memory, storage, outbound email)
+   - Include steps/commands at a high level.
+
+D) Identify risks and simplifications:
+   - How to avoid overbuilding notifications.
+   - How to keep ops minimal.
+   - How to keep cost low.
+
+Phase 2 / Nice-to-Haves (capture these but do not build now)
+- Calendar visibility: read-only integration to pull in calendars for glanceable context, but NOT to drive logic.
+- Deeper dietary / preference features:
+  - “Sally doesn’t like mushrooms,” “Timmy doesn’t like peas”
+  - Later: macro tracking, balancing vegetables/protein, meal health metrics
+- Recipe support:
+  - Linking meals to a personal recipe source on GitHub (later)
+  - Eventually broaden recipe sources if productized (not now)
+- Grocery list automation (later, acknowledge complexity)
+- Better analytics:
+  - meal frequency, rotations, “we haven’t had X in 6 weeks”
+  - ratings/notes (“this was a hit,” “too spicy,” “took longer than expected”)
+- Multi-device polish:
+  - better touchscreen UX
+  - offline/low-connectivity friendly
+  - push notifications via web push / mobile wrapper
+
+Output Format Requirements
+- Start with the plan (A), then implementation skeleton (B), then deployment (C), then risks/simplifications (D), then Phase 2 notes.
+- Keep it specific and actionable: propose concrete table schemas, routes, and job scheduling approach.
+- Use plain JavaScript examples (no TypeScript).

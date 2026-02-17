@@ -1,0 +1,23 @@
+{
+  "name": "meals-this-week",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma db push"
+  },
+  "dependencies": {
+    "@prisma/client": "6.4.1",
+    "next": "14.2.25",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "prisma": "6.4.1"
+  }
+}
