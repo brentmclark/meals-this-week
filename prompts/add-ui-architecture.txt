@@ -1,0 +1,69 @@
+You are working in a Next.js app that uses raw CSS with an ITCSS architecture, and styled-components as the Components layer.
+
+File Structure (this is the intended architecture; follow it exactly)
+- styles/settings.css      // CSS variables / design tokens only
+- styles/objects.css       // layout primitives only (o-*) e.g., o-container, o-stack, o-grid
+- styles/utilities.css     // tiny one-off helpers only (u-*) e.g., u-srOnly, u-textCenter
+- components/*             // ALL component-level styling lives here via styled-components
+- pages/* or app/*         // Next.js routes (use whichever this repo uses)
+
+Global CSS Imports
+- Global ITCSS layers are imported once via pages/_app.jsx|tsx OR app/layout.jsx|tsx (use the existing approach in this repo).
+- Do not change Next.js configuration or SSR setup unless absolutely required. Follow the repo’s existing styled-components SSR pattern.
+
+Goal
+- Improve the design/layout of all pages/components to be more scannable and consistent across mobile + desktop.
+- Fix any small UI-state issues encountered while doing so (only if needed for UX correctness).
+
+Constraints
+- No new libraries/deps except styled-components.
+- Keep ITCSS layering strict.
+- Do not introduce inline styles.
+- Avoid cross-component global selectors. No "!important" unless inside Utilities and justified.
+- Output as a unified diff.
+
+Design Tokens / Rules
+- Breakpoints: sm 640, md 768, lg 1024, xl 1280
+- Content max width: 1120px; center with horizontal padding 16 (mobile) / 24 (md+)
+- Spacing scale: 4/8/12/16/24/32/48
+- Radius: 12 for cards, 8 for controls
+- Typography: base 16, small 14, muted 13, H1 28/700, H2 18/700
+- Buttons: min height 36px, visible focus ring, hover state
+
+ITCSS Placement Requirements (non-negotiable)
+- Settings (styles/settings.css): CSS variables only (:root tokens). No selectors other than token hosts.
+- Objects (styles/objects.css): layout primitives only using o-* classes. Examples: o-container (max-width + padding), o-stack (vertical rhythm), o-grid (responsive grid).
+- Components (components/*): ALL component styling must be styled-components. Cards, buttons, inputs, headers, day rows, etc. live here.
+- Utilities (styles/utilities.css): tiny one-off helpers only using u-* classes. Keep minimal. Only use when a styled-component or object would be inappropriate.
+
+DO NOT
+- Do not add “component classes” to Objects or Utilities.
+- Do not style across component boundaries in global CSS (no `.Parent .Child button`).
+- Do not add inline styles.
+- Do not add new dependencies.
+- Do not refactor unrelated code.
+
+Layout Spec (fill this in precisely)
+- Page header: title on left; actions on right at md+, stacked on mobile.
+- Main section: <grid/list rules> (e.g., 1 col mobile, 2 cols md, 3 cols lg).
+- Each <CARD> contains: <fields> in this order, with consistent spacing and alignment.
+- Primary action placement: <where>. Secondary actions: <where>.
+- Any tables/lists should be visually grouped and aligned; labels aligned; spacing consistent.
+
+Wireframe
+<ASCII wireframe here>
+
+States / Behavior
+- Empty states: show explicit muted placeholder text, never blank space.
+- Long text: wrap; avoid overflow; no horizontal scrolling at 360px width.
+- After <SAVE>, navigate back to <TARGET> (if applicable).
+- Ensure form values persist after save + refresh.
+
+Acceptance Criteria
+- [ ] No horizontal scroll at 360px viewport width
+- [ ] Header stacks on mobile; aligns left/right on md+
+- [ ] Cards align cleanly in grid at lg+
+- [ ] Interactive elements have hover + focus-visible styles
+- [ ] No component styling added outside styled-components
+- [ ] ITCSS layers respected; Objects only do layout
+- [ ] Only the allowed files were modified

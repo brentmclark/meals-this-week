@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <main>
+        <main className="o-container o-stack">
           <NavBar />
           {children}
         </main>

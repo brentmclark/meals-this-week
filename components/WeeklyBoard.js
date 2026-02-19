@@ -1,8 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import styled from "styled-components";
 import { formatDay, startOfWeek, toISODate } from "../lib/date";
+import {
+  Button,
+  ButtonLink,
+  Card,
+  HeaderActions,
+  HeaderTitles,
+  MutedText,
+  PageHeader,
+  PageStack,
+  SectionTitle,
+  Select,
+  Subtitle,
+  Title
+} from "./ui";
 
 function shiftDate(input, days) {
   const d = new Date(`${input}T00:00:00`);
@@ -16,6 +30,61 @@ function formatThaw(label, leadDays) {
   const dayText = leadDays === 1 ? "1 day before" : `${leadDays} days before`;
   return `${label} (${dayText})`;
 }
+
+const DayGrid = styled.section`
+  display: grid;
+  gap: var(--space-12);
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 768px) {
+    grid-template-columns: ${({ $kitchenMode }) =>
+      $kitchenMode ? "repeat(3, minmax(0, 1fr))" : "repeat(2, minmax(0, 1fr))"};
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: ${({ $kitchenMode }) =>
+      $kitchenMode ? "repeat(4, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"};
+  }
+`;
+
+const DayCard = styled(Card)`
+  padding: var(--space-12);
+  background: ${({ $nightType }) =>
+    $nightType === "quick" ? "var(--color-quick)" : "var(--color-normal)"};
+`;
+
+const DayTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8);
+`;
+
+const DayName = styled.h3`
+  margin: 0;
+  font: var(--font-h2);
+  font-size: 17px;
+`;
+
+const MealName = styled.p`
+  margin: var(--space-12) 0 0;
+  min-height: 1.2em;
+  overflow-wrap: anywhere;
+`;
+
+const StagedItem = styled.p`
+  margin: 0;
+  font-size: var(--font-small);
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+`;
+
+const StagedList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+`;
 
 export default function WeeklyBoard({ kitchenMode = false }) {
   const initialStart = useMemo(() => toISODate(startOfWeek(new Date(), 0)), []);
@@ -48,55 +117,63 @@ export default function WeeklyBoard({ kitchenMode = false }) {
   }
 
   return (
-    <>
-      <section className="card" style={{ marginBottom: "0.8rem" }}>
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <h1 style={{ margin: 0 }}>Week of {weekStart}</h1>
-            <p className="muted" style={{ margin: 0 }}>Central dinner plan for the household</p>
-          </div>
-          <div className="row">
-            <button onClick={() => load(shiftDate(weekStart, -7))}>Prev</button>
-            <button onClick={() => load(shiftDate(weekStart, 7))}>Next</button>
-          </div>
-        </div>
-      </section>
+    <PageStack>
+      <Card>
+        <PageHeader>
+          <HeaderTitles>
+            <Title>Week of {weekStart}</Title>
+            <Subtitle>Central dinner plan for the household</Subtitle>
+          </HeaderTitles>
+          <HeaderActions>
+            <Button type="button" onClick={() => load(shiftDate(weekStart, -7))}>
+              Prev
+            </Button>
+            <Button type="button" onClick={() => load(shiftDate(weekStart, 7))}>
+              Next
+            </Button>
+          </HeaderActions>
+        </PageHeader>
+      </Card>
 
-      <section className="week-grid">
-        {days.map((day) => (
-          <article key={day.date} className={`day-card ${day.nightType}`}>
-            <div className="day-top">
-              <strong>{formatDay(day.date)}</strong>
-              {kitchenMode ? null : (
-                <select value={day.nightType} onChange={(e) => setNightType(day.date, e.target.value)}>
-                  <option value="normal">Normal</option>
-                  <option value="quick">Quick</option>
-                </select>
-              )}
-            </div>
-            <p style={{ minHeight: 24, marginBottom: "0.3rem" }}>{day.mealName || "No meal set"}</p>
-            {day.thawLabel ? <p className="muted">Thaw: {formatThaw(day.thawLabel, day.thawLeadDays)}</p> : null}
-            {kitchenMode ? null : (
-              <Link href={`/day/${day.date}`} className="link-button">
-                Edit day
-              </Link>
-            )}
-          </article>
-        ))}
-      </section>
+      {days.length === 0 ? (
+        <Card>
+          <MutedText>No days loaded for this week yet.</MutedText>
+        </Card>
+      ) : (
+        <DayGrid $kitchenMode={kitchenMode}>
+          {days.map((day) => (
+            <DayCard key={day.date} $nightType={day.nightType}>
+              <DayTop>
+                <DayName>{formatDay(day.date)}</DayName>
+                {kitchenMode ? null : (
+                  <Select value={day.nightType} onChange={(e) => setNightType(day.date, e.target.value)}>
+                    <option value="normal">Normal</option>
+                    <option value="quick">Quick</option>
+                  </Select>
+                )}
+              </DayTop>
+              <MealName>{day.mealName || "No meal set."}</MealName>
+              {day.thawLabel ? <MutedText>Thaw: {formatThaw(day.thawLabel, day.thawLeadDays)}</MutedText> : null}
+              {kitchenMode ? null : <ButtonLink href={`/day/${day.date}`}>Edit day</ButtonLink>}
+            </DayCard>
+          ))}
+        </DayGrid>
+      )}
 
       {kitchenMode ? null : (
-        <section className="card" style={{ marginTop: "0.9rem" }}>
-          <h3 style={{ marginTop: 0 }}>Staged meal ideas</h3>
-          {staged.length === 0 ? <p className="muted">No staged items yet.</p> : null}
-          {staged.map((item) => (
-            <p key={item.id} className="muted" style={{ margin: "0.3rem 0" }}>
-              {item.meal_name}
-              {item.preferred_date ? ` (preferred ${item.preferred_date})` : ""}
-            </p>
-          ))}
-        </section>
+        <Card>
+          <SectionTitle>Staged meal ideas</SectionTitle>
+          <StagedList>
+            {staged.length === 0 ? <MutedText>No staged items yet.</MutedText> : null}
+            {staged.map((item) => (
+              <StagedItem key={item.id}>
+                {item.meal_name}
+                {item.preferred_date ? ` (preferred ${item.preferred_date})` : ""}
+              </StagedItem>
+            ))}
+          </StagedList>
+        </Card>
       )}
-    </>
+    </PageStack>
   );
 }

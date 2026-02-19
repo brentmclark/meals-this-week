@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DayEditor from "../../../components/DayEditor";
+import { ButtonLink, HeaderTitles, MutedText, PageHeader, PageStack, Title } from "../../../components/ui";
 import { formatDay } from "../../../lib/date";
 
 export default function DayPage({ params }) {
@@ -25,11 +25,14 @@ export default function DayPage({ params }) {
   };
 
   return (
-    <section>
-      <p className="muted">
-        <Link href="/">Back to week</Link>
-      </p>
-      <h1>{formatDay(params.date)}</h1>
+    <PageStack>
+      <ButtonLink href="/">Back to week</ButtonLink>
+      <PageHeader>
+        <HeaderTitles>
+          <Title>{formatDay(params.date)}</Title>
+          <MutedText>Edit meal, notes, and thaw reminder details.</MutedText>
+        </HeaderTitles>
+      </PageHeader>
       <DayEditor
         date={params.date}
         initial={initial}
@@ -38,6 +41,6 @@ export default function DayPage({ params }) {
           router.push("/");
         }}
       />
-    </section>
+    </PageStack>
   );
 }

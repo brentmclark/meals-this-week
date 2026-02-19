@@ -1,6 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styled from "styled-components";
+import {
+  Card,
+  FieldStack,
+  InlineRow,
+  Input,
+  Label,
+  MutedText,
+  PrimaryButton,
+  Select,
+  TextArea
+} from "./ui";
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+`;
+
+const Actions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const NumberInput = styled(Input)`
+  width: 90px;
+`;
 
 export default function DayEditor({ date, initial, onSaved }) {
   const [nightType, setNightType] = useState(initial?.nightType || "normal");
@@ -19,7 +46,8 @@ export default function DayEditor({ date, initial, onSaved }) {
     setThawLeadDays(initial?.thawLeadDays ?? 1);
   }, [initial]);
 
-  async function save() {
+  async function save(e) {
+    e.preventDefault();
     const trimmedMealName = mealName.trim();
     const trimmedCustomLabel = thawReminderLabel.trim();
     const isNoReminder = thawMode === "none";
@@ -53,75 +81,82 @@ export default function DayEditor({ date, initial, onSaved }) {
   }
 
   return (
-    <div className="card">
-      <div className="row" style={{ marginBottom: "0.5rem" }}>
-        <select value={nightType} onChange={(e) => setNightType(e.target.value)}>
-          <option value="normal">Normal night</option>
-          <option value="quick">Quick night</option>
-        </select>
-      </div>
+    <Card>
+      <Form onSubmit={save}>
+        <FieldStack>
+          <Label htmlFor="nightType">Night Type</Label>
+          <Select id="nightType" value={nightType} onChange={(e) => setNightType(e.target.value)}>
+            <option value="normal">Normal night</option>
+            <option value="quick">Quick night</option>
+          </Select>
+        </FieldStack>
 
-      <div className="row" style={{ marginBottom: "0.5rem" }}>
-        <input
-          type="text"
-          value={mealName}
-          onChange={(e) => setMealName(e.target.value)}
-          placeholder="Dinner name"
-          style={{ width: "100%" }}
-        />
-      </div>
-
-      <div className="row" style={{ marginBottom: "0.5rem" }}>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Notes"
-          rows={2}
-          style={{ width: "100%" }}
-        />
-      </div>
-
-      <div className="row" style={{ marginBottom: "0.5rem" }}>
-        <select value={thawMode} onChange={(e) => setThawMode(e.target.value)}>
-          <option value="none">No thaw reminder</option>
-          <option value="meal">Use meal name</option>
-          <option value="custom">Custom reminder label</option>
-        </select>
-      </div>
-
-      {thawMode === "custom" ? (
-        <div className="row" style={{ marginBottom: "0.5rem" }}>
-          <input
+        <FieldStack>
+          <Label htmlFor="mealName">Dinner Name</Label>
+          <Input
+            id="mealName"
             type="text"
-            value={thawReminderLabel}
-            onChange={(e) => setThawReminderLabel(e.target.value)}
-            placeholder="Reminder label (ex: Potato & ham soup)"
-            style={{ width: "100%" }}
+            value={mealName}
+            onChange={(e) => setMealName(e.target.value)}
+            placeholder="Dinner name"
           />
-        </div>
-      ) : null}
+        </FieldStack>
 
-      {thawMode === "none" ? null : (
-        <div className="row" style={{ marginBottom: "0.5rem", alignItems: "center" }}>
-          <label htmlFor="thawLeadDays" className="muted">
-            Remind me
-          </label>
-          <input
-            id="thawLeadDays"
-            type="number"
-            min={0}
-            max={14}
-            value={thawLeadDays}
-            onChange={(e) => setThawLeadDays(Math.max(0, Number(e.target.value) || 0))}
-            style={{ width: 90 }}
+        <FieldStack>
+          <Label htmlFor="notes">Notes</Label>
+          <TextArea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Notes"
+            rows={3}
           />
-          <span className="muted">day(s) before</span>
-        </div>
-      )}
+        </FieldStack>
 
-      <button className="primary" onClick={save}>
-        Save
-      </button>
-    </div>
+        <FieldStack>
+          <Label htmlFor="thawMode">Thaw Reminder</Label>
+          <Select id="thawMode" value={thawMode} onChange={(e) => setThawMode(e.target.value)}>
+            <option value="none">No thaw reminder</option>
+            <option value="meal">Use meal name</option>
+            <option value="custom">Custom reminder label</option>
+          </Select>
+        </FieldStack>
+
+        {thawMode === "custom" ? (
+          <FieldStack>
+            <Label htmlFor="thawReminderLabel">Custom Reminder Label</Label>
+            <Input
+              id="thawReminderLabel"
+              type="text"
+              value={thawReminderLabel}
+              onChange={(e) => setThawReminderLabel(e.target.value)}
+              placeholder="Reminder label (example: Potato and ham soup)"
+            />
+          </FieldStack>
+        ) : null}
+
+        {thawMode === "none" ? null : (
+          <FieldStack>
+            <Label htmlFor="thawLeadDays">Reminder Lead Time</Label>
+            <InlineRow>
+              <MutedText as="span">Remind me</MutedText>
+              <NumberInput
+                id="thawLeadDays"
+                type="number"
+                min={0}
+                max={14}
+                value={thawLeadDays}
+                onChange={(e) => setThawLeadDays(Math.max(0, Number(e.target.value) || 0))}
+              />
+              <MutedText as="span">day(s) before</MutedText>
+            </InlineRow>
+          </FieldStack>
+        )}
+
+        <Actions>
+          <PrimaryButton type="submit">Save</PrimaryButton>
+        </Actions>
+      </Form>
+    </Card>
   );
 }
