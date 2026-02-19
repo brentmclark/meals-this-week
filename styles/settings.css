@@ -1,16 +1,16 @@
 :root {
-  --color-bg: #f2f4ed;
-  --color-surface: #ffffff;
-  --color-surface-quiet: #f8faf4;
-  --color-ink: #1c2618;
-  --color-muted: #5f6c5f;
-  --color-border: #d5ddd0;
-  --color-accent: #2f7d4a;
-  --color-accent-hover: #26663c;
-  --color-accent-soft: #d7ebdc;
-  --color-danger: #8f2121;
-  --color-quick: #f6e1cc;
-  --color-normal: #d8e6f4;
+  --color-bg: #1b1e23;
+  --color-bg-soft: #2a2f36;
+  --color-surface: #363d46;
+  --color-text: #eaf0ff;
+  --color-muted: #b7bfd0;
+  --color-border: #49525f;
+  --color-day-normal: #334b66;
+  --color-day-quick: #5b4637;
+  --color-accent: #6ee7ff;
+  --color-accent-contrast: #061018;
+  --color-danger: #ff5a6a;
+  --color-success: #37d67a;
 
   --bp-sm: 640px;
   --bp-md: 768px;
@@ -38,5 +38,5 @@
   --font-h1: 700 28px/1.2 "Avenir Next", "Segoe UI", sans-serif;
   --font-h2: 700 18px/1.3 "Avenir Next", "Segoe UI", sans-serif;
 
-  --focus-ring: 0 0 0 3px rgba(47, 125, 74, 0.25);
+  --focus-ring: 0 0 0 3px rgba(110, 231, 255, 0.35);
 }

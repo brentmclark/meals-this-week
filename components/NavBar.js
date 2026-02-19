@@ -34,18 +34,23 @@ const NavLink = styled(Link)`
   min-height: 36px;
   display: inline-flex;
   align-items: center;
-  border: 1px solid ${({ $active }) => ($active ? "#b8d5bf" : "transparent")};
+  border: 1px solid ${({ $active }) => ($active ? "var(--color-accent)" : "transparent")};
   border-radius: var(--radius-control);
   padding: 0 var(--space-12);
-  background: ${({ $active }) => ($active ? "var(--color-accent-soft)" : "transparent")};
-  color: ${({ $active }) => ($active ? "var(--color-ink)" : "var(--color-muted)")};
+  background: ${({ $active }) => ($active ? "var(--color-accent)" : "transparent")};
+  color: ${({ $active }) => ($active ? "var(--color-accent-contrast)" : "var(--color-muted)")};
   font-weight: ${({ $active }) => ($active ? 600 : 500)};
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: var(--color-surface-quiet);
-    border-color: var(--color-border);
-    color: var(--color-ink);
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  &:active {
+    background: var(--color-border);
+    border-color: var(--color-accent);
+    color: var(--color-text);
   }
 
   &:focus-visible {

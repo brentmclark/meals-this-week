@@ -1,0 +1,17 @@
+Color scheme update
+- Use these tokens in styles/settings.css (:root):
+  --color-bg: #0B1220
+  --color-surface: #111A2E
+  --color-text: #EAF0FF
+  --color-muted: #A9B4D0
+  --color-border: #22304F
+  --color-accent: #6EE7FF
+  --color-accent-contrast: #061018
+  --color-danger: #FF5A6A
+  --color-success: #37D67A
+
+Rules
+- Components must reference semantic tokens only (no raw hex in styled-components).
+- Objects/utilities do not get color decisions (layout only).
+- Ensure contrast for text on bg/surface meets accessibility expectations (aim for WCAG AA).
+- Update interactive states: hover, active, focus ring, disabled.

@@ -67,19 +67,27 @@ const controlStyles = css`
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
   background: var(--color-surface);
-  color: var(--color-ink);
+  color: var(--color-text);
   padding: 0 var(--space-12);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
   &:hover {
-    background: var(--color-surface-quiet);
-    border-color: #c5cdc0;
+    border-color: var(--color-accent);
+  }
+
+  &:active {
+    border-color: var(--color-accent);
   }
 
   &:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
     border-color: var(--color-accent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
@@ -104,20 +112,29 @@ const buttonBase = css`
   border-radius: var(--radius-control);
   padding: var(--space-4) var(--space-12);
   background: var(--color-surface);
-  color: var(--color-ink);
+  color: var(--color-text);
   cursor: pointer;
   white-space: nowrap;
   transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: var(--color-surface-quiet);
-    border-color: #c5cdc0;
+    border-color: var(--color-accent);
+  }
+
+  &:active {
+    background: var(--color-border);
+    border-color: var(--color-accent);
   }
 
   &:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
     border-color: var(--color-accent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
@@ -127,12 +144,23 @@ export const Button = styled.button`
 
 export const PrimaryButton = styled(Button)`
   background: var(--color-accent);
-  color: #fff;
-  border-color: transparent;
+  color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
 
   &:hover {
-    background: var(--color-accent-hover);
-    border-color: transparent;
+    background: var(--color-text);
+    border-color: var(--color-text);
+  }
+
+  &:active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  &:disabled {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent);
   }
 `;
 

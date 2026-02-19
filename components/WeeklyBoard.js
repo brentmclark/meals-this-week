@@ -35,22 +35,11 @@ const DayGrid = styled.section`
   display: grid;
   gap: var(--space-12);
   grid-template-columns: minmax(0, 1fr);
-
-  @media (min-width: 768px) {
-    grid-template-columns: ${({ $kitchenMode }) =>
-      $kitchenMode ? "repeat(3, minmax(0, 1fr))" : "repeat(2, minmax(0, 1fr))"};
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: ${({ $kitchenMode }) =>
-      $kitchenMode ? "repeat(4, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"};
-  }
 `;
 
 const DayCard = styled(Card)`
   padding: var(--space-12);
-  background: ${({ $nightType }) =>
-    $nightType === "quick" ? "var(--color-quick)" : "var(--color-normal)"};
+  background: ${({ $nightType }) => ($nightType === "quick" ? "var(--color-day-quick)" : "var(--color-day-normal)")};
 `;
 
 const DayTop = styled.div`
@@ -140,7 +129,7 @@ export default function WeeklyBoard({ kitchenMode = false }) {
           <MutedText>No days loaded for this week yet.</MutedText>
         </Card>
       ) : (
-        <DayGrid $kitchenMode={kitchenMode}>
+        <DayGrid>
           {days.map((day) => (
             <DayCard key={day.date} $nightType={day.nightType}>
               <DayTop>
