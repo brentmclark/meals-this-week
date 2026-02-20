@@ -7,7 +7,7 @@ import { requireSession } from "../../../../lib/session";
 import { scheduleReminderForEntry } from "../../../../lib/reminders";
 
 const schema = z.object({
-  nightType: z.enum(["quick", "normal"]).optional(),
+  nightType: z.enum(["quick", "normal", "out"]).optional(),
   mealName: z.string().max(140).optional(),
   notes: z.string().max(400).optional(),
   thawReminderLabel: z.union([z.string().trim().min(1).max(140), z.null()]).optional(),

@@ -39,7 +39,12 @@ const DayGrid = styled.section`
 
 const DayCard = styled(Card)`
   padding: var(--space-12);
-  background: ${({ $nightType }) => ($nightType === "quick" ? "var(--color-day-quick)" : "var(--color-day-normal)")};
+  background: ${({ $nightType }) =>
+    $nightType === "quick"
+      ? "var(--color-day-quick)"
+      : $nightType === "out"
+        ? "var(--color-day-out)"
+        : "var(--color-day-normal)"};
 `;
 
 const DayTop = styled.div`
@@ -138,6 +143,7 @@ export default function WeeklyBoard({ kitchenMode = false }) {
                   <Select value={day.nightType} onChange={(e) => setNightType(day.date, e.target.value)}>
                     <option value="normal">Normal</option>
                     <option value="quick">Quick</option>
+                    <option value="out">No-Cook Night</option>
                   </Select>
                 )}
               </DayTop>

@@ -29,6 +29,7 @@ const ErrorText = styled.p`
 `;
 
 export default function LoginCard() {
+  const [identifier, setIdentifier] = useState("");
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
@@ -40,11 +41,18 @@ export default function LoginCard() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ passcode })
+      body: JSON.stringify({ identifier, passcode })
     });
 
     if (!res.ok) {
-      setError("Passcode did not match.");
+      const body = await res.json().catch(() => ({}));
+      if (body.error === "identifier_required") {
+        setError("User is required when multi-user auth is enabled.");
+      } else if (body.error === "auth_config_invalid") {
+        setError("Auth user config is invalid. Check server logs.");
+      } else {
+        setError("Credentials did not match.");
+      }
       return;
     }
 
@@ -55,15 +63,25 @@ export default function LoginCard() {
     <Wrapper>
       <LoginPanel>
         <Title>Meals This Week</Title>
-        <MutedText>Private family planner</MutedText>
+        <MutedText>Private household planner</MutedText>
         <Form onSubmit={onSubmit}>
           <FieldStack>
-            <Label htmlFor="passcode">Family Passcode</Label>
+            <Label htmlFor="identifier">User</Label>
+            <Input
+              id="identifier"
+              type="text"
+              placeholder="email or login"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+            />
+          </FieldStack>
+          <FieldStack>
+            <Label htmlFor="passcode">Passcode</Label>
             <Input
               id="passcode"
               type="password"
               required
-              placeholder="Family passcode"
+              placeholder="Passcode"
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
             />

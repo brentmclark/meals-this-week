@@ -1,0 +1,16 @@
+[
+  {
+    "login": "brent",
+    "email": "brent@example.com",
+    "name": "Brent",
+    "role": "admin",
+    "passcodeHash": "replace-with-sha256-hash"
+  },
+  {
+    "login": "alex",
+    "email": "alex@example.com",
+    "name": "Alex",
+    "role": "member",
+    "passcodeHash": "replace-with-sha256-hash"
+  }
+]

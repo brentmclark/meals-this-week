@@ -88,6 +88,7 @@ export default function DayEditor({ date, initial, onSaved }) {
           <Select id="nightType" value={nightType} onChange={(e) => setNightType(e.target.value)}>
             <option value="normal">Normal night</option>
             <option value="quick">Quick night</option>
+            <option value="out">No-Cook Night</option>
           </Select>
         </FieldStack>
 
