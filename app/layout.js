@@ -10,10 +10,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <main className="o-container o-stack">
-          <NavBar />
-          {children}
-        </main>
+        <div className="o-pageWrap">
+          <header className="o-siteHeader">
+            <div className="o-container">
+              <NavBar />
+            </div>
+          </header>
+          <main className="o-siteBody">
+            <div className="o-container o-stack">{children}</div>
+          </main>
+        </div>
       </body>
     </html>
   );

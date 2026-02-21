@@ -4,6 +4,26 @@
   padding-inline: var(--container-pad);
 }
 
+.o-pageWrap {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.o-siteHeader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--color-bg-soft) 82%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  padding-block: var(--space-12);
+}
+
+.o-siteBody {
+  padding-block: var(--space-16) var(--space-32);
+}
+
 @media (min-width: 768px) {
   .o-container {
     padding-inline: var(--container-pad-md);

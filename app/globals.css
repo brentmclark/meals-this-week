@@ -38,7 +38,3 @@ textarea {
   font: inherit;
   color: inherit;
 }
-
-main {
-  padding-block: var(--space-16) var(--space-32);
-}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import styled from "styled-components";
 import { Button } from "./ui";
+import BrandLogo from "./BrandLogo";
 
 const links = [
   ["/", "This Week"],
@@ -13,14 +14,25 @@ const links = [
 ];
 
 const Shell = styled.nav`
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-12);
+  align-items: center;
 
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  @media (min-width: 920px) {
+    grid-template-columns: auto 1fr auto;
+    column-gap: var(--space-24);
+  }
+`;
+
+const BrandLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: var(--radius-control);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 `;
 
@@ -28,6 +40,10 @@ const LinkGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-8);
+
+  @media (min-width: 920px) {
+    justify-content: center;
+  }
 `;
 
 const NavLink = styled(Link)`
@@ -63,26 +79,32 @@ const NavLink = styled(Link)`
 export default function NavBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const isLoginPage = pathname === "/login";
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.replace("/login");
   }
 
-  if (pathname === "/login") return null;
-
   return (
     <Shell>
-      <LinkGroup>
-        {links.map(([href, label]) => (
-          <NavLink key={href} href={href} $active={pathname === href}>
-            {label}
-          </NavLink>
-        ))}
-      </LinkGroup>
-      <Button type="button" onClick={logout}>
-        Logout
-      </Button>
+      <BrandLink href="/" aria-label="Meals This Week home">
+        <BrandLogo />
+      </BrandLink>
+      {!isLoginPage ? (
+        <>
+          <LinkGroup>
+            {links.map(([href, label]) => (
+              <NavLink key={href} href={href} $active={pathname === href}>
+                {label}
+              </NavLink>
+            ))}
+          </LinkGroup>
+          <Button type="button" onClick={logout}>
+            Logout
+          </Button>
+        </>
+      ) : null}
     </Shell>
   );
 }
