@@ -79,6 +79,22 @@ npm run dev
 
 `POST /api/reminders/run` marks due reminders as sent. In production, call this from a scheduler (Fly machine cron, DO cron, or GitHub Action), send `x-cron-secret`, and add an email provider in that handler.
 
+## Fly + PlanetScale deploy
+
+Use the interactive setup script to create/verify the Fly app, prompt for required values, set secrets, and deploy:
+
+```bash
+./scripts/setup-fly-planetscale.sh
+```
+
+The script will prompt for:
+
+- Fly app name / org / region
+- `DATABASE_URL` (PlanetScale Postgres connection string)
+- App passcode (it hashes this into `FAMILY_PASSCODE_HASH`)
+- `SESSION_SECRET`, `CRON_SECRET` (or auto-generate)
+- Default household/user values
+
 ## Multi-user notes
 
 - If `AUTH_USERS_JSON` or `AUTH_USERS_FILE` is set, login switches to multi-user mode and requires `User` + `Passcode`.
