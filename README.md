@@ -9,7 +9,10 @@ Small private family meal-planning app built with Next.js (App Router, JavaScrip
 - Meal history search
 - Staged meals backlog
 - Kitchen display route (`/display`)
-- Shared passcode auth (or optional multi-user auth)
+- Self-serve signup + login (email or username)
+- Family management with manager/member roles and invites
+- Email verification + password reset flows
+- Rate limiting + account lockout for auth endpoints
 - Reminder rows generated from day-level thaw reminder settings
 
 ## Local setup
@@ -26,33 +29,12 @@ npm install
 cp .env.example .env.local
 ```
 
-3. Configure auth (pick one):
+3. Configure auth:
 
-Single shared passcode (existing behavior), example with passcode `family-dinner`:
+Default behavior is DB-backed auth with self-serve signup on `/login`.
+Set `APP_BASE_URL` to your app URL for verification/reset/invite links.
 
-```bash
-echo -n 'family-dinner' | shasum -a 256
-```
-
-Copy the hash into `FAMILY_PASSCODE_HASH`.
-
-Optional multi-user auth:
-
-```bash
-cp auth-users.example.json auth-users.json
-```
-
-Then in `.env.local`, set:
-
-```bash
-AUTH_USERS_FILE=./auth-users.json
-```
-
-Each entry in `auth-users.json` needs a `passcodeHash` (sha256 of that user's passcode), for example:
-
-```bash
-echo -n 'alex-passcode' | shasum -a 256
-```
+Optional legacy fallback (if you still want it): either `FAMILY_PASSCODE_HASH` or `AUTH_USERS_FILE` / `AUTH_USERS_JSON`.
 
 4. Generate Prisma client and apply schema:
 
@@ -74,6 +56,9 @@ npm run dev
 - `/history` meal history
 - `/staged` staged meals
 - `/display` large kitchen view
+- `/family` household members + invites
+- `/verify-email` email verification landing
+- `/reset-password` password reset landing
 
 ## Reminder delivery
 
@@ -95,9 +80,12 @@ The script will prompt for:
 - `SESSION_SECRET`, `CRON_SECRET` (or auto-generate)
 - Default household/user values
 
-## Multi-user notes
+## Auth notes
 
-- If `AUTH_USERS_JSON` or `AUTH_USERS_FILE` is set, login switches to multi-user mode and requires `User` + `Passcode`.
-- `User` can be either `login` or `email`.
-- On first login, each configured user is upserted into the DB automatically.
-- If no multi-user env is set, the app falls back to `FAMILY_PASSCODE_HASH`.
+- `/login` supports account creation directly in the app.
+- Login identifier accepts either `email` or `username`.
+- First local account created becomes `manager`; later local accounts default to `member`.
+- Legacy auth (`AUTH_USERS_*` or `FAMILY_PASSCODE_HASH`) is still supported as fallback for compatibility.
+- Managers can invite additional family accounts (parents/kids) into the same household.
+- Invitees can sign up independently and join via invite token.
+- Existing users can accept an invite after login from `/family`.

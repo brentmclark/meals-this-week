@@ -10,6 +10,7 @@ const links = [
   ["/", "This Week"],
   ["/history", "History"],
   ["/staged", "Staged"],
+  ["/family", "Family"],
   ["/display", "Kitchen Display"]
 ];
 
