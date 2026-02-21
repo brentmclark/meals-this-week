@@ -80,7 +80,7 @@ const NavLink = styled(Link)`
 export default function NavBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const isLoginPage = pathname === "/login";
+  const isAuthPage = ["/login", "/signup", "/forgot-password", "/verify-email", "/reset-password"].includes(pathname);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -92,7 +92,7 @@ export default function NavBar() {
       <BrandLink href="/" aria-label="Meals This Week home">
         <BrandLogo />
       </BrandLink>
-      {!isLoginPage ? (
+      {!isAuthPage ? (
         <>
           <LinkGroup>
             {links.map(([href, label]) => (

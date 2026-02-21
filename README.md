@@ -33,6 +33,7 @@ cp .env.example .env.local
 
 Default behavior is DB-backed auth with self-serve signup on `/login`.
 Set `APP_BASE_URL` to your app URL for verification/reset/invite links.
+To send real emails, set `RESEND_API_KEY` and `RESEND_FROM_EMAIL`.
 
 Optional legacy fallback (if you still want it): either `FAMILY_PASSCODE_HASH` or `AUTH_USERS_FILE` / `AUTH_USERS_JSON`.
 
@@ -89,3 +90,4 @@ The script will prompt for:
 - Managers can invite additional family accounts (parents/kids) into the same household.
 - Invitees can sign up independently and join via invite token.
 - Existing users can accept an invite after login from `/family`.
+- Invite emails include a direct invite link with a secure token.

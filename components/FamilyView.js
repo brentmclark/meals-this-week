@@ -86,7 +86,11 @@ export default function FamilyView() {
 
     setInviteEmail("");
     setInviteRole("member");
-    setMessage(body.inviteUrl ? `Invite link (dev): ${body.inviteUrl}` : "Invite sent.");
+    setMessage(
+      body.inviteUrl
+        ? `Invite email sent. Direct link (for testing): ${body.inviteUrl}`
+        : "Invite email sent."
+    );
     load();
   }
 

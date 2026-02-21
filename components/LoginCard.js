@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import styled from "styled-components";
 import { Card, FieldStack, Input, Label, MutedText, PrimaryButton, Title } from "./ui";
 
@@ -34,25 +35,27 @@ const Divider = styled.hr`
   margin: var(--space-16) 0;
 `;
 
+const InlineLink = styled(Link)`
+  color: var(--color-accent);
+`;
+
+const InlineAction = styled.button`
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--color-accent);
+  font: inherit;
+  cursor: pointer;
+`;
+
 export default function LoginCard() {
+  const params = useSearchParams();
   const [identifier, setIdentifier] = useState("");
   const [passcode, setPasscode] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [signupError, setSignupError] = useState("");
   const [helperMessage, setHelperMessage] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [signupPasscode, setSignupPasscode] = useState("");
-  const [confirmPasscode, setConfirmPasscode] = useState("");
-  const [inviteToken, setInviteToken] = useState("");
   const router = useRouter();
-  const params = useSearchParams();
-
-  useEffect(() => {
-    const tokenFromUrl = params.get("invite");
-    if (tokenFromUrl) setInviteToken(tokenFromUrl);
-  }, [params]);
+  const inviteToken = params.get("invite") || "";
 
   async function onLogin(e) {
     e.preventDefault();
@@ -85,76 +88,6 @@ export default function LoginCard() {
     router.replace(inviteToken ? `/family?invite=${encodeURIComponent(inviteToken)}` : "/");
   }
 
-  async function onSignup(e) {
-    e.preventDefault();
-    setSignupError("");
-
-    if (signupPasscode !== confirmPasscode) {
-      setSignupError("Passcodes do not match.");
-      return;
-    }
-
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        username,
-        email,
-        displayName: displayName || username,
-        passcode: signupPasscode,
-        inviteToken: inviteToken || undefined
-      })
-    });
-
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      if (body.error === "username_taken") {
-        setSignupError("Username is already taken.");
-      } else if (body.error === "email_taken") {
-        setSignupError("Email is already in use.");
-      } else if (body.error === "invite_email_mismatch") {
-        setSignupError("Invite token email must match signup email.");
-      } else if (body.error === "invalid_invite") {
-        setSignupError("Invite token is invalid or expired.");
-      } else if (body.error === "rate_limited") {
-        setSignupError("Too many signup attempts. Try again shortly.");
-      } else if (body.error === "invalid") {
-        setSignupError("Please check your signup fields and try again.");
-      } else {
-        setSignupError("Could not create account.");
-      }
-      return;
-    }
-
-    setHelperMessage(
-      body.verificationUrl
-        ? `Account created. Verify email first: ${body.verificationUrl}`
-        : "Account created. Check email for verification link."
-    );
-    setSignupPasscode("");
-    setConfirmPasscode("");
-  }
-
-  async function forgotPasscode() {
-    setHelperMessage("");
-    if (!identifier.trim()) {
-      setLoginError("Enter email or username first.");
-      return;
-    }
-
-    const res = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ identifier })
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setLoginError(body.error === "rate_limited" ? "Too many requests. Try again shortly." : "Request failed.");
-      return;
-    }
-    setHelperMessage(body.resetUrl ? `Password reset link (dev): ${body.resetUrl}` : "If account exists, reset email was sent.");
-  }
-
   async function resendVerification() {
     setHelperMessage("");
     if (!identifier.trim()) {
@@ -183,7 +116,7 @@ export default function LoginCard() {
     <Wrapper>
       <LoginPanel>
         <Title>Meals This Week</Title>
-        <MutedText>Private household planner</MutedText>
+        <MutedText>Sign in</MutedText>
         <Form onSubmit={onLogin}>
           <FieldStack>
             <Label htmlFor="identifier">Email or Username</Label>
@@ -208,89 +141,20 @@ export default function LoginCard() {
           </FieldStack>
           {loginError ? <ErrorText>{loginError}</ErrorText> : null}
           <PrimaryButton type="submit">Log In</PrimaryButton>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <PrimaryButton type="button" onClick={forgotPasscode}>
-              Forgot Passcode
-            </PrimaryButton>
-            <PrimaryButton type="button" onClick={resendVerification}>
-              Resend Verification
-            </PrimaryButton>
-          </div>
         </Form>
         <Divider />
-        <MutedText>Create account</MutedText>
-        <Form onSubmit={onSignup}>
-          <FieldStack>
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              type="text"
-              required
-              minLength={3}
-              maxLength={32}
-              placeholder="familychef"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </FieldStack>
-          <FieldStack>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </FieldStack>
-          <FieldStack>
-            <Label htmlFor="inviteToken">Invite Token (Optional)</Label>
-            <Input
-              id="inviteToken"
-              type="text"
-              placeholder="Paste invite token if you have one"
-              value={inviteToken}
-              onChange={(e) => setInviteToken(e.target.value)}
-            />
-          </FieldStack>
-          <FieldStack>
-            <Label htmlFor="displayName">Display Name</Label>
-            <Input
-              id="displayName"
-              type="text"
-              placeholder="Alex"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
-          </FieldStack>
-          <FieldStack>
-            <Label htmlFor="signupPasscode">Passcode</Label>
-            <Input
-              id="signupPasscode"
-              type="password"
-              required
-              minLength={8}
-              placeholder="At least 8 characters"
-              value={signupPasscode}
-              onChange={(e) => setSignupPasscode(e.target.value)}
-            />
-          </FieldStack>
-          <FieldStack>
-            <Label htmlFor="confirmPasscode">Confirm Passcode</Label>
-            <Input
-              id="confirmPasscode"
-              type="password"
-              required
-              minLength={8}
-              placeholder="Repeat passcode"
-              value={confirmPasscode}
-              onChange={(e) => setConfirmPasscode(e.target.value)}
-            />
-          </FieldStack>
-          {signupError ? <ErrorText>{signupError}</ErrorText> : null}
-          <PrimaryButton type="submit">Create Account</PrimaryButton>
-        </Form>
+        <MutedText>
+          Need an account?{" "}
+          <InlineLink href={inviteToken ? `/signup?invite=${encodeURIComponent(inviteToken)}` : "/signup"}>
+            Create one here
+          </InlineLink>
+        </MutedText>
+        <MutedText>
+          Forgot passcode screen: <InlineLink href="/forgot-password">Open forgot password</InlineLink>
+        </MutedText>
+        <MutedText>
+          Email not verified? <InlineAction onClick={resendVerification}>Resend verification</InlineAction>
+        </MutedText>
         {helperMessage ? <MutedText style={{ marginTop: 12 }}>{helperMessage}</MutedText> : null}
       </LoginPanel>
     </Wrapper>
